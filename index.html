@@ -59,10 +59,10 @@
 
   /* KPI grid */
   .kpis{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:14px}
-  @media(min-width:640px){.kpis{grid-template-columns:repeat(4,1fr)}}
+  @media(min-width:640px){.kpis{grid-template-columns:repeat(3,1fr)}}
   .kpi{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow:var(--shadow); position:relative; overflow:hidden}
   .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--green-500)}
-  .kpi.w::before{background:var(--water)} .kpi.a::before{background:var(--amber)} .kpi.e::before{background:var(--earth)}
+  .kpi.w::before{background:var(--water)} .kpi.a::before{background:var(--amber)}
   .kpi .ic{font-size:20px}
   .kpi .val{font-size:23px; font-weight:800; margin-top:6px; letter-spacing:-.5px}
   .kpi .lab{font-size:12px; color:var(--muted); margin-top:1px}
@@ -171,7 +171,7 @@
   <main>
     <!-- ============ INÍCIO ============ -->
     <section class="view active" id="v-inicio">
-      <div class="sectitle">📊 Visão geral do talhão</div>
+      <div class="sectitle">📊 Visão geral do ambiente monitorado</div>
       <div class="kpis" id="kpis"></div>
 
       <div class="card">
@@ -370,8 +370,7 @@ const curZone = zoneOf(DATA[N-1][M2]);
 document.getElementById('kpis').innerHTML = [
   {c:'',ic:'💧',val:DATA[N-1][M2].toFixed(1)+'%',lab:'Umidade atual (S2)',foot:`Estado: <b>${curZone[0]}</b>`},
   {c:'w',ic:'⚡',val:DATA[N-1][V2].toFixed(3)+' V',lab:'Tensão atual (S2)',foot:`Média ${sV2.avg.toFixed(2)} V`},
-  {c:'a',ic:'📈',val:'±'+amp+'%',lab:'Amplitude de variação',foot:`de ${sM2.min.toFixed(0)}% a ${sM2.max.toFixed(0)}%`},
-  {c:'e',ic:'🔢',val:sA2.avg.toFixed(0),lab:'ADC médio (S2)',foot:`${sA2.min}–${sA2.max}`},
+  {c:'a',ic:'📈',val:'±'+amp+'%',lab:'Amplitude de variação da umidade',foot:`umidade de ${sM2.min.toFixed(0)}% a ${sM2.max.toFixed(0)}% · média ${sM2.avg.toFixed(1)}%`},
 ].map(k=>`<div class="kpi ${k.c}"><div class="ic">${k.ic}</div><div class="val">${k.val}</div><div class="lab">${k.lab}</div><div class="foot">${k.foot}</div></div>`).join('');
 
 /* ============ MOTOR DE GRÁFICOS (SVG) ============ */
