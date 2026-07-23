@@ -123,7 +123,7 @@
   .tbl-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
   .tbl-tools input{flex:1;min-width:120px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:var(--card);color:var(--ink);font:inherit;font-size:13px}
   .tbl-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
-  table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:620px}
+  table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:780px}
   th,td{padding:9px 10px;text-align:right;white-space:nowrap}
   th{background:var(--bg);position:sticky;top:0;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;cursor:pointer;user-select:none}
   th:first-child,td:first-child{text-align:left}
@@ -161,7 +161,7 @@
       <div class="logo">🌾</div>
       <div>
         <h1>AgroÁgua · Monitor de Irrigação</h1>
-        <div class="sub">Sensores de umidade do solo · Dispositivo <b id="hdev">esp1</b></div>
+        <div class="sub">Sensores resistivo (S1) e capacitivo (S2) · Dispositivo <b id="hdev">esp1</b></div>
       </div>
       <div class="pill"><span class="dot"></span> ao vivo</div>
     </div>
@@ -176,7 +176,7 @@
 
       <div class="card">
         <h2>💧 Umidade do solo ao longo do tempo</h2>
-        <div class="desc">Sensor 2 (ativo) — cada ponto é uma leitura enviada pelo ESP32 via MQTT. As faixas coloridas mostram o estado agronômico do solo.</div>
+        <div class="desc">Sensor 2 · capacitivo (ativo) — cada ponto é uma leitura enviada pelo ESP32 via MQTT. As faixas coloridas mostram o estado agronômico do solo.</div>
         <div class="chart-wrap"><div id="hero"></div></div>
         <div class="legend">
           <span><i class="sw" style="background:var(--water)"></i>Saturado &gt;90%</span>
@@ -202,7 +202,7 @@
           <button data-g="umid" class="on">💧 Umidade</button>
           <button data-g="tensao">⚡ Tensão</button>
           <button data-g="adc">🔢 ADC bruto</button>
-          <button data-g="comp">🆚 S1 vs S2</button>
+          <button data-g="comp">🆚 Capacitivo vs Resistivo</button>
         </div>
         <div class="chart-wrap"><div id="gchart"></div></div>
         <div class="legend" id="glegend"></div>
@@ -247,7 +247,7 @@
 
       <details class="faq" open><summary>🔢 Do solo ao número: a jornada do dado <span class="cx">＋</span></summary>
         <div class="body">
-          <p>O sensor capacitivo mede a <b>constante dielétrica</b> do solo, que muda conforme a quantidade de água. Ele gera uma <b>tensão elétrica</b> proporcional.</p>
+          <p>O sensor capacitivo (S2) mede a <b>constante dielétrica</b> do solo, que muda conforme a quantidade de água. Ele gera uma <b>tensão elétrica</b> proporcional.</p>
           <p>O conversor <b>ADC</b> (Analógico → Digital) do ESP32 transforma essa tensão em um número inteiro de <b>0 a 4095</b> (12 bits de resolução).</p>
           <p>Um firmware converte o ADC em <b>% de umidade</b> usando os pontos de calibração (solo seco = 0%, solo saturado = 100%).</p>
           <div class="formula">tensão = ADC ÷ 4095 × 3,3 V</div>
@@ -277,7 +277,7 @@
             <dt>timestamp_local</dt><dd>Mesma leitura no horário local (UTC−3).</dd>
             <dt>topic</dt><dd>Tópico MQTT onde o dado foi publicado.</dd>
             <dt>device_id</dt><dd>Identificador do dispositivo/estação (1).</dd>
-            <dt>adc1 / adc2</dt><dd>Valor bruto do conversor (0–4095) dos sensores 1 e 2.</dd>
+            <dt>adc1 / adc2</dt><dd>Valor bruto do conversor (0–4095) do sensor 1 (resistivo) e do sensor 2 (capacitivo).</dd>
             <dt>tensao1 / tensao2</dt><dd>Tensão em volts correspondente (0–3,3 V).</dd>
             <dt>umidade1 / umidade2</dt><dd>Umidade do solo calculada (0–100%).</dd>
             <dt>raw_payload</dt><dd>A mensagem original enviada pelo dispositivo.</dd>
@@ -294,14 +294,14 @@
         <div class="desc" id="tblcount"></div>
         <div class="tbl-tools">
           <input id="q" type="search" placeholder="🔎 Filtrar por horário ou valor (ex.: 100, 13:24)…">
-          <div class="seg"><button id="onlyactive" class="">Só sensor 2</button></div>
+          <div class="seg"><button id="onlyactive" class="">Só capacitivo (S2)</button></div>
         </div>
         <div class="tbl-scroll">
           <table>
             <thead><tr>
               <th data-s="0">Hora local</th>
-              <th data-s="1">ADC 1</th><th data-s="2">Tensão 1</th><th data-s="3">Umid. 1</th>
-              <th data-s="4">ADC 2</th><th data-s="5">Tensão 2</th><th data-s="6">Umid. 2</th>
+              <th data-s="1">ADC 1 (resist.)</th><th data-s="2">Tensão 1 (resist.)</th><th data-s="3">Umid. 1 (resist.)</th>
+              <th data-s="4">ADC 2 (capac.)</th><th data-s="5">Tensão 2 (capac.)</th><th data-s="6">Umid. 2 (capac.)</th>
             </tr></thead>
             <tbody id="tbody"></tbody>
           </table>
@@ -368,8 +368,8 @@ document.getElementById('hstrip').innerHTML = [
 function zoneOf(m){ if(m<30)return['Crítico','b-red']; if(m<60)return['Alerta','b-amber']; if(m<=90)return['Ideal','b-green']; return['Saturado','b-water']; }
 const curZone = zoneOf(DATA[N-1][M2]);
 document.getElementById('kpis').innerHTML = [
-  {c:'',ic:'💧',val:DATA[N-1][M2].toFixed(1)+'%',lab:'Umidade atual (S2)',foot:`Estado: <b>${curZone[0]}</b>`},
-  {c:'w',ic:'⚡',val:DATA[N-1][V2].toFixed(3)+' V',lab:'Tensão atual (S2)',foot:`Média ${sV2.avg.toFixed(2)} V`},
+  {c:'',ic:'💧',val:DATA[N-1][M2].toFixed(1)+'%',lab:'Umidade atual (S2 · capacitivo)',foot:`Estado: <b>${curZone[0]}</b>`},
+  {c:'w',ic:'⚡',val:DATA[N-1][V2].toFixed(3)+' V',lab:'Tensão atual (S2 · capacitivo)',foot:`Média ${sV2.avg.toFixed(2)} V`},
   {c:'a',ic:'📈',val:'±'+amp+'%',lab:'Amplitude de variação da umidade',foot:`umidade de ${sM2.min.toFixed(0)}% a ${sM2.max.toFixed(0)}% · média ${sM2.avg.toFixed(1)}%`},
 ].map(k=>`<div class="kpi ${k.c}"><div class="ic">${k.ic}</div><div class="val">${k.val}</div><div class="lab">${k.lab}</div><div class="foot">${k.foot}</div></div>`).join('');
 
@@ -504,8 +504,8 @@ document.getElementById('insights').innerHTML = [
   ['🌱',`<b>Secagem natural observada:</b> nos primeiros minutos a umidade caiu de <b>88,4%</b> para <b>73,7%</b> — o solo perdendo água por evaporação e absorção das raízes.`],
   ['💧',`<b>Evento de irrigação/reumedecimento às 13:23:</b> a umidade saltou de <b>0%</b> para <b>100%</b> em segundos, com o ADC despencando de 4095 para 560.`],
   ['🏜️',`<b>${dryCount} leituras</b> marcaram <b>solo seco</b> (ADC travado em 4095 ≈ 3,3 V) — típico de sensor fora do solo ou lendo o ar entre 11:29 e 13:23.`],
-  ['⚖️',`<b>Espelho perfeito:</b> quando a umidade sobe, a tensão e o ADC caem. É a assinatura de um sensor capacitivo funcionando corretamente.`],
-  ['🛑',`<b>Sensor 1 inativo:</b> registrou <b>0% o tempo todo</b> (ADC fixo ~3320). Um único canal (S2) sustentou todo o monitoramento útil.`],
+  ['⚖️',`<b>Espelho perfeito:</b> quando a umidade sobe, a tensão e o ADC caem. É a assinatura do <b>sensor capacitivo (S2)</b> funcionando corretamente.`],
+  ['🛑',`<b>Sensor 1 (resistivo) inativo:</b> registrou <b>0% o tempo todo</b> (ADC fixo ~3320). Um único canal — o <b>capacitivo (S2)</b> — sustentou todo o monitoramento útil.`],
 ].map(([em,t])=>`<div class="insight"><div class="em">${em}</div><div class="t">${t}</div></div>`).join('');
 
 /* ============ ABA GRÁFICOS ============ */
@@ -516,13 +516,13 @@ const glegend=document.getElementById('glegend');
 let curG='umid';
 const gConfig={
   umid:{title:'Umidade do solo (%)',desc:'A variável que interessa ao produtor. Faixas coloridas = estado agronômico. Linha tracejada = irrigação.',
-    legend:'<span><i class="sw" style="background:var(--green-600)"></i>Umidade S2 (%)</span>'},
+    legend:'<span><i class="sw" style="background:var(--green-600)"></i>Umidade S2 · capacitivo (%)</span>'},
   tensao:{title:'Tensão do sensor (V)',desc:'A voltagem lida pelo ESP32. Sobe quando o solo seca (máx 3,3 V) e cai quando molha.',
-    legend:'<span><i class="sw" style="background:var(--water)"></i>Tensão S2 (V)</span>'},
+    legend:'<span><i class="sw" style="background:var(--water)"></i>Tensão S2 · capacitivo (V)</span>'},
   adc:{title:'Valor ADC bruto (0–4095)',desc:'O número inteiro direto do conversor. 4095 = seco/saturação do sensor; valores baixos = solo úmido.',
-    legend:'<span><i class="sw" style="background:var(--earth)"></i>ADC S2</span>'},
-  comp:{title:'Sensor 1 vs Sensor 2 (umidade %)',desc:'Comparação dos dois canais. O sensor 1 ficou "morto" em 0% — só o sensor 2 mediu o solo.',
-    legend:'<span><i class="sw" style="background:var(--green-600)"></i>Umidade S2</span><span><i class="sw" style="background:var(--muted)"></i>Umidade S1</span>'}
+    legend:'<span><i class="sw" style="background:var(--earth)"></i>ADC S2 · capacitivo</span>'},
+  comp:{title:'Sensor 2 · capacitivo vs Sensor 1 · resistivo (umidade %)',desc:'Comparação dos dois canais. O sensor 1 (resistivo) ficou "morto" em 0% — só o sensor 2 (capacitivo) mediu o solo.',
+    legend:'<span><i class="sw" style="background:var(--green-600)"></i>Umidade S2 · capacitivo</span><span><i class="sw" style="background:var(--muted)"></i>Umidade S1 · resistivo</span>'}
 };
 function drawG(){
   const c=gConfig[curG]; gtitle.textContent=c.title; gdesc.textContent=c.desc; glegend.innerHTML=c.legend;
@@ -595,7 +595,7 @@ const s1={min:stats(M1).min,max:stats(M1).max,avg:stats(M1).avg, adc:stats(A1), 
 const lastM2=DATA[N-1][M2], z2=zoneOf(lastM2);
 document.getElementById('sensorcards').innerHTML=`
   <div class="card">
-    <h2>🟢 Sensor 2 · canal ativo</h2>
+    <h2>🟢 Sensor 2 · capacitivo (ativo)</h2>
     <div class="desc">Responsável por todas as medições úteis do solo.</div>
     <div class="gauge" style="margin-top:12px">${ring(lastM2,'var(--green-600)')}
       <div><div class="num">${lastM2.toFixed(1)}%</div><span class="badge ${z2[1]}">${z2[0]}</span></div></div>
@@ -608,7 +608,7 @@ document.getElementById('sensorcards').innerHTML=`
     </div>
   </div>
   <div class="card">
-    <h2>⚪ Sensor 1 · canal inativo</h2>
+    <h2>⚪ Sensor 1 · resistivo (inativo)</h2>
     <div class="desc">Registrou valor constante — provável desconexão ou fora do solo.</div>
     <div class="gauge" style="margin-top:12px">${ring(0,'var(--muted)')}
       <div><div class="num">0%</div><span class="badge b-gray">Sem sinal útil</span></div></div>
